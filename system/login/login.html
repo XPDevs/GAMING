@@ -1,1 +1,85 @@
-﻿<a href="../desktop/desktop.html">Desktop</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            flex-direction: column;
+        }
+
+        .controller {
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .movableBox {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controller">
+        <button id="moveUp">Up</button>
+        <button id="moveDown">Down</button>
+        <button id="moveLeft">Left</button>
+        <button id="moveRight">Right</button>
+    </div>
+
+    <div id="movableBox" class="movableBox"></div>
+
+    <script>
+        // Get the movable box element
+        const box = document.getElementById('movableBox');
+
+        // Set initial position
+        let posX = 0;
+        let posY = 0;
+
+        // Function to update box position
+        function updatePosition() {
+            box.style.left = posX + 'px';
+            box.style.top = posY + 'px';
+        }
+
+        // Button event listeners for controller
+        document.getElementById('moveUp').addEventListener('click', () => {
+            posY -= 10;  // Move up
+            updatePosition();
+        });
+
+        document.getElementById('moveDown').addEventListener('click', () => {
+            posY += 10;  // Move down
+            updatePosition();
+        });
+
+        document.getElementById('moveLeft').addEventListener('click', () => {
+            posX -= 10;  // Move left
+            updatePosition();
+        });
+
+        document.getElementById('moveRight').addEventListener('click', () => {
+            posX += 10;  // Move right
+            updatePosition();
+        });
+    </script>
+
+</body>
+</html>
