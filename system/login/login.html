@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controller Example</title>
+    <title>Gamepad Cursor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            overflow: hidden;
             background-color: #f0f0f0;
-            flex-direction: column;
         }
 
-        .controller {
-            margin-bottom: 20px;
-        }
-
-        button {
-            margin: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-
-        .movableBox {
-            width: 100px;
-            height: 100px;
+        #gamepadCursor {
+            width: 20px;
+            height: 20px;
             background-color: red;
+            border-radius: 50%;
             position: absolute;
         }
     </style>
 </head>
 <body>
 
-    <div class="controller">
-        <button id="moveUp">Up</button>
-        <button id="moveDown">Down</button>
-        <button id="moveLeft">Left</button>
-        <button id="moveRight">Right</button>
-    </div>
-
-    <div id="movableBox" class="movableBox"></div>
+    <div id="gamepadCursor"></div>
 
     <script>
-        // Get the movable box element
-        const box = document.getElementById('movableBox');
+        const cursor = document.getElementById('gamepadCursor');
 
-        // Set initial position
-        let posX = 0;
-        let posY = 0;
+        let cursorX = window.innerWidth / 2;
+        let cursorY = window.innerHeight / 2;
+        let sensitivity = 5; // Joystick movement sensitivity
 
-        // Function to update box position
-        function updatePosition() {
-            box.style.left = posX + 'px';
-            box.style.top = posY + 'px';
+        // Function to update cursor position
+        function updateCursorPosition() {
+            cursor.style.left = `${cursorX}px`;
+            cursor.style.top = `${cursorY}px`;
         }
 
-        // Button event listeners for controller
-        document.getElementById('moveUp').addEventListener('click', () => {
-            posY -= 10;  // Move up
-            updatePosition();
-        });
+        // Detect and handle the gamepad input
+        function handleGamepadInput() {
+            const gamepads = navigator.getGamepads();
 
-        document.getElementById('moveDown').addEventListener('click', () => {
-            posY += 10;  // Move down
-            updatePosition();
-        });
+            // If a gamepad is connected
+            if (gamepads[0]) {
+                const gp = gamepads[0];
 
-        document.getElementById('moveLeft').addEventListener('click', () => {
-            posX -= 10;  // Move left
-            updatePosition();
-        });
+                // Axis values for the left analog stick (ranges from -1 to 1)
+                const axisX = gp.axes[0]; // Left/Right
+                const axisY = gp.axes[1]; // Up/Down
 
-        document.getElementById('moveRight').addEventListener('click', () => {
-            posX += 10;  // Move right
-            updatePosition();
-        });
+                // Update cursor position based on the joystick movement
+                if (Math.abs(axisX) > 0.1 || Math.abs(axisY) > 0.1) {
+                    cursorX += axisX * sensitivity;
+                    cursorY += axisY * sensitivity;
+
+                    // Keep cursor within the bounds of the screen
+                    cursorX = Math.max(0, Math.min(window.innerWidth - 20, cursorX));
+                    cursorY = Math.max(0, Math.min(window.innerHeight - 20, cursorY));
+
+                    updateCursorPosition();
+                }
+            }
+
+            // Request the next animation frame for continuous gamepad input updates
+            requestAnimationFrame(handleGamepadInput);
+        }
+
+        // Start detecting the gamepad
+        function detectGamepad() {
+            if (navigator.getGamepads()[0]) {
+                console.log('Controller connected');
+                handleGamepadInput();
+            } else {
+                console.log('Please connect a controller');
+            }
+
+            // Poll for gamepad every 100ms
+            setTimeout(detectGamepad, 100);
+        }
+
+        // Start the gamepad detection when the page loads
+        window.onload = detectGamepad;
+
+        // Adjust sensitivity when the window is resized
+        window.onresize = () => {
+            cursorX = window.innerWidth / 2;
+            cursorY = window.innerHeight / 2;
+            updateCursorPosition();
+        };
     </script>
 
 </body>
