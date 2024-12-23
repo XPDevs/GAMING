@@ -59,9 +59,78 @@
     .button:hover {
       background-color: #777;
     }
+/* Custom cursor styles */
+        #gamepadCursor {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 9999; /* Ensures the cursor overlays everything */
+        }
+
+        /* Content area */
+        .content {
+            position: relative;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            margin: 20px;
+            max-width: 600px;
+            margin-top: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Modal styles */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+        }
+
+        #modalContent {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
   </style>
 </head>
 <body>
+
+<!-- Modal -->
+    <div id="modal">
+        <div id="modalContent">
+            <p id="modalMessage">Looking for controllers...</p>
+        </div>
+    </div>
+
+    <!-- Cursor -->
+    <div id="gamepadCursor"></div>
 
   <div class="settings-container">
     <h1>Settings</h1>
@@ -94,6 +163,79 @@
     function goBack() {
       window.history.back();
     }
+
+ const cursor = document.getElementById('gamepadCursor');
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modalMessage');
+        let cursorX = window.innerWidth / 2;
+        let cursorY = window.innerHeight / 2;
+        let sensitivity = 1; // Adjusted sensitivity for slower movement
+
+        // Function to update cursor position
+        function updateCursorPosition() {
+            cursor.style.left = `${cursorX}px`;
+            cursor.style.top = `${cursorY}px`;
+        }
+
+        // Handle the gamepad input
+        function handleGamepadInput() {
+            const gamepads = navigator.getGamepads();
+
+            // If a gamepad is connected
+            if (gamepads[0]) {
+                const gp = gamepads[0];
+
+                // Axis values for the left analog stick (ranges from -1 to 1)
+                const axisX = gp.axes[0]; // Left/Right
+                const axisY = gp.axes[1]; // Up/Down
+
+                // Update cursor position based on joystick movement
+                if (Math.abs(axisX) > 0.1 || Math.abs(axisY) > 0.1) {
+                    cursorX += axisX * sensitivity;
+                    cursorY += axisY * sensitivity;
+
+                    // Keep cursor within the bounds of the screen
+                    cursorX = Math.max(0, Math.min(window.innerWidth - 20, cursorX));
+                    cursorY = Math.max(0, Math.min(window.innerHeight - 20, cursorY));
+
+                    updateCursorPosition();
+                }
+
+                // Check for the "X" button press (typically button 0 or 1 on most controllers)
+                if (gp.buttons[0].pressed) {
+                    // Simulate a click event on any element the cursor is hovering over
+                    document.elementFromPoint(cursorX, cursorY)?.click();
+                }
+            }
+
+            // Request the next animation frame for continuous gamepad input updates
+            requestAnimationFrame(handleGamepadInput);
+        }
+
+        // Start detecting the gamepad
+        function detectGamepad() {
+            const gamepads = navigator.getGamepads();
+
+            // Check if a gamepad is connected
+            if (gamepads[0]) {
+                console.log('Controller connected');
+                modal.style.display = 'none'; // Hide modal if controller is found
+                handleGamepadInput();
+            } else {
+                modalMessage.innerText = 'We can\'t find a controller. Please connect one to try again.';
+                setTimeout(detectGamepad, 1000); // Try again after 1 second
+            }
+        }
+
+        // Start the gamepad detection when the page loads
+        window.onload = detectGamepad;
+
+        // Adjust sensitivity when the window is resized
+        window.onresize = () => {
+            cursorX = window.innerWidth / 2;
+            cursorY = window.innerHeight / 2;
+            updateCursorPosition();
+        };
   </script>
 
 </body>
