@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen Custom Terminal</title>
+    <style>
+        /* Full screen styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            background-color: black;
+            color: white;
+            font-family: Consolas, monospace;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            font-size: 20px;
+            overflow: hidden; /* Remove overall scrollbars */
+        }
+
+        #terminal {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 10px;
+            white-space: pre-wrap; /* Ensures input wraps */
+            overflow: hidden; /* Remove scrolling inside terminal */
+        }
+
+        .output {
+            color: #FFFFFF;
+            margin: 2px 0;
+        }
+
+        .command {
+            color: #00FF00;
+        }
+
+        /* Input styling */
+        input {
+            color: #00FF00;
+            background-color: black;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        /* Make the input area look like the terminal prompt */
+        #inputArea {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        span {
+            color: white; /* White prompt '>' */
+        }
+
+        /* Make the terminal grow as needed */
+        #terminal {
+            display: block;
+            overflow-y: auto; /* Allow content to grow without showing scroll */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="terminal">
+        <div class="output" id="output"></div>
+        <div id="inputArea">
+            <span>> </span><input type="text" id="commandInput" autofocus />
+        </div>
+    </div>
+
+    <script>
+        // Terminal output and input handling
+        const terminalOutput = document.getElementById('output');
+        const commandInput = document.getElementById('commandInput');
+
+        // Predefined commands
+        const commands = {
+            '/suicide-temp': () => {
+                // Automatically navigate to a specific HTML file
+                window.location.href = '../rest.html'; // Replace with your desired file
+                return 'Exiting terminal...';
+            },
+            '/suicide-perm': () => {
+                // Automatically navigate to a specific HTML file
+                window.location.href = '../shut.html'; // Replace with your desired file
+                return 'Exiting terminal...';
+            }
+
+            '/reset-all': => {
+            localStorage.clear();
+            return "All user has been deleted."
+        }
+        };
+
+        // Process the input when user presses enter
+        commandInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const input = commandInput.value.trim();
+                commandInput.value = '';
+                processCommand(input);
+            }
+        });
+
+        // Process commands and show the output
+        function processCommand(input) {
+            let output;
+            const parts = input.split(' ');  // Split input into command and arguments
+            const command = parts[0];
+            const argument = parts.slice(1).join(' '); // Combine all arguments after the command
+
+            if (commands[command]) {
+                output = commands[command](argument);
+            } else {
+                output = `Command not found: ${input}`; // Add message for unrecognized commands
+            }
+            appendToTerminal(input, output);
+        }
+
+        // Append the user's input and the output to the terminal
+        function appendToTerminal(input, output) {
+            terminalOutput.innerHTML += `<div class="command">> ${input}</div>`;
+            terminalOutput.innerHTML += `<div class="output">${output}</div>`;
+        }
+
+    </script>
+
+</body>
+</html>

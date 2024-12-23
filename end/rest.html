@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image with Spinner</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000; /* Black background */
+      font-family: Arial, sans-serif;
+      color: #fff; /* Ensure text is visible if needed */
+    }
+    .container {
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    .spinner {
+      margin: 20px auto;
+      width: 40px;
+      height: 40px;
+      border: 4px solid transparent;
+      border-top: 4px solid #ffffff; /* White spinner */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <p>Restarting your computer.</p>
+  </div>
+
+  <script>
+    let shiftPressedTime = 0;
+    let shiftHeldDown = false;
+
+    // Detect if the Shift key is held down
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Shift' && !shiftHeldDown) {
+        shiftPressedTime = Date.now(); // Start tracking when Shift is pressed
+        shiftHeldDown = true;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift') {
+        shiftHeldDown = false;
+      }
+    });
+
+    // Check if Shift key is held down for more than 5 seconds
+    function checkShiftDuration() {
+      if (shiftHeldDown && Date.now() - shiftPressedTime >= 5000) {
+        window.location.href = 'op.html'; // Redirect to op.html after holding Shift for 5 seconds
+      }
+    }
+
+    // Redirect to check.html after 10 seconds
+    setTimeout(() => {
+      if (!shiftHeldDown || Date.now() - shiftPressedTime < 5000) {
+        window.location.href = "../index.html";
+      }
+    }, 10000);
+
+    // Periodically check if Shift is held for 5 seconds
+    setInterval(checkShiftDuration, 100);
+  </script>
+</body>
+</html>

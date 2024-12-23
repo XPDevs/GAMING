@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 500px;
+      max-width: 100%;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    input[type="text"], input[type="url"], select {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .list-group {
+      margin-top: 30px;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .list-item .links {
+      margin-left: 15px;
+    }
+    .list-item .links a {
+      color: #007BFF;
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+    .list-item .links a:hover {
+      text-decoration: underline;
+    }
+    .list-item button {
+      background-color: #dc3545;
+      border: none;
+      padding: 8px 16px;
+      margin-top: 5px;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    .list-item button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Software Manager</h1>
+    <div class="input-group">
+      <label for="software-name">Software Name</label>
+      <input type="text" id="software-name" placeholder="Enter software name">
+    </div>
+    <div class="input-group">
+      <label for="version-select">Select Version</label>
+      <select id="version-select">
+        <!-- Versions will be dynamically added here -->
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="software-link">Software Link</label>
+      <input type="url" id="software-link" placeholder="Enter the software URL">
+    </div>
+    <button onclick="addSoftware()">Add Software</button>
+    <div class="list-group" id="software-list"></div>
+  </div>
+
+  <script>
+    // Populate versions from 0.001 to 11.6
+    function populateVersions() {
+      const versionSelect = document.getElementById('version-select');
+      for (let i = 0.001; i <= 11.6; i += 0.001) {
+        const option = document.createElement('option');
+        option.value = i.toFixed(3);
+        option.textContent = `v${i.toFixed(3)}`;
+        versionSelect.appendChild(option);
+      }
+    }
+
+    // Add software item
+    function addSoftware() {
+      const name = document.getElementById('software-name').value.trim();
+      const version = document.getElementById('version-select').value;
+      const link = document.getElementById('software-link').value.trim();
+
+      if (name === "" || !version || link === "") {
+        alert("Please enter the software name, select a version, and provide a link.");
+        return;
+      }
+
+      const softwareList = document.getElementById('software-list');
+
+      // Create list item
+      const listItem = document.createElement('div');
+      listItem.classList.add('list-item');
+      listItem.innerHTML = `
+        <span>${name} - v${version}</span>
+        <div class="links">
+          <a href="${link}" target="_blank">Software Link</a>
+          <a href="https://github.com" target="_blank">GitHub</a>
+        </div>
+        <div>
+          <button onclick="removeSoftware(this)">Remove</button>
+          <button onclick="renameSoftware(this)">Rename</button>
+          <button onclick="changeVersion(this)">Change Version</button>
+        </div>
+      `;
+      softwareList.appendChild(listItem);
+
+      // Save to local storage
+      saveToLocalStorage();
+
+      // Reset inputs
+      document.getElementById('software-name').value = '';
+      document.getElementById('version-select').value = '';
+      document.getElementById('software-link').value = '';
+    }
+
+    // Remove software item
+    function removeSoftware(button) {
+      const listItem = button.parentElement.parentElement;
+      listItem.remove();
+      saveToLocalStorage();
+    }
+
+    // Rename software item
+    function renameSoftware(button) {
+      const listItem = button.parentElement.parentElement;
+      const softwareName = listItem.querySelector('span');
+      const newName = prompt("Enter new software name:", softwareName.textContent.split(' - ')[0]);
+
+      if (newName) {
+        softwareName.textContent = newName + ' - ' + softwareName.textContent.split(' - ')[1];
+        saveToLocalStorage();
+      }
+    }
+
+    // Change software version
+    function changeVersion(button) {
+      const listItem = button.parentElement.parentElement;
+      const softwareName = listItem.querySelector('span');
+      const currentVersion = softwareName.textContent.split(' - ')[1].replace('v', '');
+      
+      const newVersion = prompt("Enter new version (current: " + currentVersion + "):");
+      if (newVersion && parseFloat(newVersion) >= 0.001 && parseFloat(newVersion) <= 11.6) {
+        softwareName.textContent = softwareName.textContent.split(' - ')[0] + ' - v' + newVersion;
+        saveToLocalStorage();
+      } else {
+        alert("Invalid version.");
+      }
+    }
+
+    // Save software list to local storage
+    function saveToLocalStorage() {
+      const softwareList = [];
+      const listItems = document.querySelectorAll('.list-item');
+      listItems.forEach(item => {
+        const name = item.querySelector('span').textContent.split(' - ')[0];
+        const version = item.querySelector('span').textContent.split(' - ')[1].replace('v', '');
+        const link = item.querySelector('.links a').href;
+        softwareList.push({ name, version, link });
+      });
+      localStorage.setItem('softwareList', JSON.stringify(softwareList));
+    }
+
+    // Load software list from local storage
+    function loadFromLocalStorage() {
+      const softwareList = JSON.parse(localStorage.getItem('softwareList')) || [];
+      const softwareListContainer = document.getElementById('software-list');
+      softwareList.forEach(software => {
+        const listItem = document.createElement('div');
+        listItem.classList.add('list-item');
+        listItem.innerHTML = `
+          <span>${software.name} - v${software.version}</span>
+          <div class="links">
+            <a href="${software.link}" target="_blank">Software Link</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+          </div>
+          <div>
+            <button onclick="removeSoftware(this)">Remove</button>
+            <button onclick="renameSoftware(this)">Rename</button>
+            <button onclick="changeVersion(this)">Change Version</button>
+          </div>
+        `;
+        softwareListContainer.appendChild(listItem);
+      });
+    }
+
+    // Initialize versions and load from local storage when page loads
+    window.onload = function() {
+      populateVersions();
+      loadFromLocalStorage();
+    }
+
+    // Ask the user to download software list before leaving the page
+    window.onbeforeunload = function(event) {
+      const softwareList = JSON.parse(localStorage.getItem('softwareList')) || [];
+      if (softwareList.length > 0) {
+        event.returnValue = "Do you want to download your software list before leaving?";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image with Spinner</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000; /* Black background */
+      font-family: Arial, sans-serif;
+      color: #fff; /* Ensure text is visible if needed */
+    }
+    .container {
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    .spinner {
+      margin: 20px auto;
+      width: 40px;
+      height: 40px;
+      border: 4px solid transparent;
+      border-top: 4px solid #ffffff; /* White spinner */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <p>Booting...</p>
+  </div>
+
+  <script>
+    let shiftHeld = false;
+    let shiftStartTime = 0;
+
+    // Redirect to check.html after 10 seconds
+    setTimeout(() => {
+      if (!shiftHeld) {
+        window.location.href = "check.html";
+      }
+    }, 10000);
+
+    // Listen for keydown and keyup events
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Shift" && !shiftHeld) {
+        shiftStartTime = Date.now();
+        shiftHeld = true;
+      }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Shift") {
+        const shiftDuration = Date.now() - shiftStartTime;
+        if (shiftDuration >= 3000) {  // If Shift was held for 3 seconds
+          window.location.href = "boot2.html";
+        }
+        shiftHeld = false;
+      }
+    });
+  </script>
+</body>
+</html>
