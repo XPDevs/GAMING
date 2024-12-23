@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gamepad Cursor</title>
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       background-color: #121212;
@@ -30,6 +32,12 @@
       font-size: 16px;
       border-radius: 5px;
       transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+
+    .button i {
+      margin-right: 8px; /* Space between icon and text */
     }
 
     .button:hover {
@@ -95,7 +103,12 @@
   </div>
 
   <div class="header">
-    <button class="button" onclick="window.location.href='settings.html'">Settings</button>
+    <button class="button" onclick="window.location.href='settings.html'">
+      <i class="fas fa-cogs"></i> Settings
+    </button>
+    <button class="button" onclick="window.location.href='../desktop/desktop.html'">
+      <i class="fas fa-sign-out-alt"></i> Exit
+    </button>
   </div>
 
   <div id="gamepadCursor"></div>
